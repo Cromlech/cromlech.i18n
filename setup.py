@@ -10,10 +10,12 @@ install_requires = [
     'setuptools',
     'zope.interface',
     'zope.i18n',
+    'cromlech.io',
+    'grokcore.component',
+    'zope.component',
     ]
 
 tests_require = [
-    'cromlech.io',
     ]
 
 setup(name='cromlech.i18n',
