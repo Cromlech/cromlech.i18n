@@ -2,7 +2,7 @@
 
 import threading
 from grokcore.component import adapter, implementer
-from cromlech.io import IRequest
+from cromlech.browser import IRequest
 from cromlech.i18n import ILanguage, IAllowedLanguages
 from zope.component import queryUtility
 from zope.i18n.config import ALLOWED_LANGUAGES

@@ -4,13 +4,13 @@ import os
 from setuptools import setup, find_packages
 
 
-version = '0.1a1'
+version = '0.1'
 
 install_requires = [
     'setuptools',
     'zope.interface',
     'zope.i18n',
-    'cromlech.io',
+    'cromlech.browser >= 0.5',
     'grokcore.component',
     'zope.component',
     ]
