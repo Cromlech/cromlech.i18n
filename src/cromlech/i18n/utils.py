@@ -31,15 +31,15 @@ def getLanguage():
     return language.prefered
 
 
-def negotiate(context, preferences=''):
+def negotiate(context):
     """This method returns a prefered language based on the allowed languages,
     and on the request, passed as 'context'. This could be a good idea to 
     """
-    languages = IAllowedLanguages(name=preferences)
+    languages = IAllowedLanguages.component()
     if languages is None:
         languages = ALLOWED_LANGUAGES
     if languages is not None:
-        negotiator = INegotiator()
+        negotiator = INegotiator.component()
         if negotiator is not None:
             return negotiator.getLanguage(languages, context)
     return None
