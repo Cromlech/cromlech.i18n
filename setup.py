@@ -11,8 +11,6 @@ install_requires = [
     'zope.interface',
     'zope.i18n',
     'cromlech.browser >= 0.5',
-    'grokcore.component',
-    'zope.component',
     ]
 
 tests_require = [

@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
+import crom
 import threading
-from grokcore.component import adapter, implementer
+
 from cromlech.browser import IRequest
 from cromlech.i18n import ILanguage, IAllowedLanguages
-from zope.component import queryUtility
 from zope.i18n.config import ALLOWED_LANGUAGES
 from zope.i18n.interfaces import INegotiator
 from zope.component import getGlobalSiteManager
@@ -35,18 +35,19 @@ def negotiate(context, preferences=''):
     """This method returns a prefered language based on the allowed languages,
     and on the request, passed as 'context'. This could be a good idea to 
     """
-    languages = queryUtility(IAllowedLanguages, name=preferences)
+    languages = IAllowedLanguages(name=preferences)
     if languages is None:
         languages = ALLOWED_LANGUAGES
     if languages is not None:
-        negotiator = queryUtility(INegotiator)
+        negotiator = INegotiator()
         if negotiator is not None:
             return negotiator.getLanguage(languages, context)
     return None
 
 
-@adapter(IRequest)
-@implementer(ILanguage)
+@crom.adapter
+@crom.sources(IRequest)
+@crom.target(ILanguage)
 def HTTPRequestLanguage(request):
     """A specific implementation of an ILanguage resolver for IRequest.
     It uses a thread local object as a cache, for the request lifetime.
@@ -67,5 +68,5 @@ def register_allowed_languages(languages, name='', registry=None):
     to set up the global/root preferences for your i18n translations.
     """
     if registry is None:
-        registry = getGlobalSiteManager()
-    registry.registerUtility(frozenset(languages), IAllowedLanguages, name)
+        registry = crom.implicit.lookup
+    registry.register(tuple(), IAllowedLanguages, name, frozenset(languages))
