@@ -1,72 +1,53 @@
 # -*- coding: utf-8 -*-
 
-import crom
 import threading
-
+from . import LOCALE_KEY
+from .interfaces import ILanguage
 from cromlech.browser import IRequest
-from cromlech.i18n import ILanguage, IAllowedLanguages
-from zope.i18n.config import ALLOWED_LANGUAGES
-from zope.i18n.interfaces import INegotiator
-from zope.component import getGlobalSiteManager
+from zope.interface import ComponentLookupError
 
 
-class Language(threading.local):
+class LocaleSettings(threading.local):
     """Language resolution.
     """
-    prefered = None
+    locale = None
+    language = None
 
 
-language = Language()
+locale_settings = LocaleSettings()
 
 
-def setLanguage(lang=None):
-    """Sets the thread local language preference.
-    """
-    language.prefered = lang
+def normalize_lang(lang):
+    lang = lang.strip().lower()
+    lang = lang.replace('_', '-')
+    lang = lang.replace(' ', '')
+    return lang
+
+
+def resolveLocale(environ, default=None):
+    return environ.get(LOCALE_KEY, default)
+
+
+def setLocale(locale=None):
+    locale_settings.locale = locale
+    locale_settings.language = normalize_lang(locale)
+
+
+def getLocale():
+    return locale_settings.locale 
 
 
 def getLanguage():
-    """Gets the thread local language preference.
-    """
-    return language.prefered
+    return locale_settings.language
 
 
-def negotiate(context, preferences=''):
-    """This method returns a prefered language based on the allowed languages,
-    and on the request, passed as 'context'. This could be a good idea to 
-    """
-    languages = IAllowedLanguages(name=preferences)
-    if languages is None:
-        languages = ALLOWED_LANGUAGES
-    if languages is not None:
-        negotiator = INegotiator()
-        if negotiator is not None:
-            return negotiator.getLanguage(languages, context)
-    return None
+class Language(object):
 
-
-@crom.adapter
-@crom.sources(IRequest)
-@crom.target(ILanguage)
-def HTTPRequestLanguage(request):
-    """A specific implementation of an ILanguage resolver for IRequest.
-    It uses a thread local object as a cache, for the request lifetime.
-    If your preferences are context-dependant, please consider overriding
-    this with your own implementation.
-    """
-    language = getLanguage()
-    if language is None:
-        language = negotiate(request)
+    def __init__(self, language):
         setLanguage(language)
-    return language
 
-
-def register_allowed_languages(languages, name='', registry=None):
-    """This utilitarian method is only useful when setting up
-    `IAllowedLanguages` as utilities. This is the out-of-the-box
-    behavior. Make sure to use this method when you create your application
-    to set up the global/root preferences for your i18n translations.
-    """
-    if registry is None:
-        registry = crom.implicit.lookup
-    registry.register(tuple(), IAllowedLanguages, name, frozenset(languages))
+    def __enter__(self):
+        return getLanguage()
+        
+    def __exit__(self, type, value, traceback):
+        return setLanguage()
