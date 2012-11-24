@@ -3,4 +3,4 @@
 LOCALE_KEY = 'I18N_LOCALE'
 
 from .interfaces import ILocale
-from .utils import Language
+from .utils import Language, getLanguage
