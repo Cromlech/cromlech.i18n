@@ -9,7 +9,7 @@ version = '0.1'
 install_requires = [
     'setuptools',
     'zope.interface',
-    'zope.i18nmessageid',
+    'babel',
     'cromlech.browser >= 0.5',
     ]
 
@@ -38,7 +38,7 @@ setup(name='cromlech.i18n',
       install_requires=install_requires,
       entry_points="""
       # -*- Entry points: -*-
-      [paste.filter_app_factory]
-      locale = cromlech.i18n.middleware:locale_settings
+      [cromlech.i18n.translation_directory]
+      test_translations = cromlech.i18n.translations:register_test_translations
       """,
       )

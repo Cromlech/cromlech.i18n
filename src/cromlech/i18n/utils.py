@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
 
+import re
+import sys
 import threading
+
 from . import LOCALE_KEY
 from .interfaces import ILanguage
 from cromlech.browser import IRequest
 from zope.interface import ComponentLookupError
+from zope.i18nmessageid import MessageFactory, Message
 
 
 class LocaleSettings(threading.local):
@@ -18,13 +22,13 @@ locale_settings = LocaleSettings()
 
 
 def normalize_lang(lang):
-    lang = lang.strip().lower()
+    lang = lang.strip()
     lang = lang.replace('_', '-')
     lang = lang.replace(' ', '')
     return lang
 
 
-def resolveLocale(environ, default=None):
+def resolve_locale(environ, default=None):
     return environ.get(LOCALE_KEY, default)
 
 
@@ -34,7 +38,7 @@ def setLocale(locale=None):
 
 
 def getLocale():
-    return locale_settings.locale 
+    return locale_settings.locale
 
 
 def getLanguage():
@@ -48,6 +52,6 @@ class Language(object):
 
     def __enter__(self):
         return getLanguage()
-        
+
     def __exit__(self, type, value, traceback):
         return setLanguage()

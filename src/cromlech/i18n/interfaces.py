@@ -1,11 +1,24 @@
 # -*- coding: utf-8 -*-
 
+from zope.schema import TextLine
 from zope.interface import Interface
 
 
-class ILocale(Interface):
+class ILocalizer(Interface):
     """Returns the target locale to render translated elements.
     """
     def __str__():
-        """Returns a locale code as a string.
+        """Returns the locale code as a string.
+        """
+
+    def translate(tstring, domain, mapping):
+        """
+        """
+
+
+class ITranslationDirectory(Interface):
+    """
+    """
+    def __str__():
+        """Returns the absolute path of the directory.
         """
