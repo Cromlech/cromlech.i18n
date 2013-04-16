@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from .interfaces import ILocale
 from .utils import Language, accept_languages
 
 

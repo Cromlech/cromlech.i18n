@@ -51,6 +51,8 @@ class Translations(gettext.GNUTranslations, object):
         if not domain:
             domain = cls.DEFAULT_DOMAIN
         filename = gettext.find(domain, dirname, locales)
+        import pytest
+        pytest.set_trace()
         if not filename:
             return gettext.NullTranslations()
         with open(filename, 'rb') as fp:
@@ -159,7 +161,10 @@ def register_translations_directory(path, registry=i18n_registry):
 
 def register_test_translations(registry=i18n_registry):
     path = os.path.join(os.path.dirname(__file__), "locales")
-    register_translations_directory(path, registy)
+    register_translations_directory(path, registry)
+
+
+_loaded = False
 
 
 def load_translations_directories(registry=i18n_registry):

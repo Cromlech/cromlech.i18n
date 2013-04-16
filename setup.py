@@ -7,10 +7,10 @@ from setuptools import setup, find_packages
 version = '1.0-dev'
 
 install_requires = [
+    'crom',
     'setuptools',
     'zope.interface',
-    'babel',
-    'cromlech.browser >= 0.5',
+    'translationstring',
     ]
 
 tests_require = [

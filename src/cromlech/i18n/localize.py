@@ -41,9 +41,8 @@ def make_localizer(locale, translation_directories):
     translations = Translations()
     translations._catalog = {}
 
-    locale = normalize_lang(locale)
-    if '-' in locale:
-        locales_to_try = locale.split('-')[0], locale
+    if '_' in locale:
+        locales_to_try = locale.split('_')[0], locale
     else:
         locales_to_try = (locale,)
 
@@ -54,7 +53,6 @@ def make_localizer(locale, translation_directories):
     # locale if necessary. Ordering from least specific to most specific
     # allows us to call translations.add in the below loop to get this
     # behavior.
-
     for tdir in translation_directories:
         locale_dirs = []
         for lname in locales_to_try:
@@ -64,7 +62,7 @@ def make_localizer(locale, translation_directories):
 
         for locale_dir in locale_dirs:
             messages_dir = os.path.join(locale_dir, 'LC_MESSAGES')
-            if not os.path.isdir(realpath(messages_dir)):
+            if not os.path.isdir(os.path.realpath(messages_dir)):
                 continue
             for mofile in os.listdir(messages_dir):
                 mopath = os.path.realpath(os.path.join(messages_dir,
@@ -78,7 +76,19 @@ def make_localizer(locale, translation_directories):
     return Localizer(locale_name=locale, translations=translations)
 
 
-def get_localizer(environ, registry=i18n_registry):
+def get_localizer(locale, registry=i18n_registry):
+    localizer = ILocalizer.component(
+        name=locale, default=None, lookup=registry)
+
+    if localizer is None:
+        tdirs = ITranslationDirectory.subscription(lookup=registry)
+        localizer = make_localizer(locale, tdirs)
+        i18n_registry.register(tuple(), ILocalizer, locale, localizer)
+
+    return localizer
+
+
+def get_environ_localizer(environ, registry=i18n_registry):
 
     localizer = environ.get(LOCALIZER_KEY)
     if localizer is None:
@@ -86,13 +96,7 @@ def get_localizer(environ, registry=i18n_registry):
         if locale is None:
             raise NotImplementedError("Can't resolve a localizer")
 
-        localizer = ILocalizer.component(
-            name=locale, default=None, lookup=registry)
-
-        if localizer is None:
-            tdirs = ITranslationDirectory.subscription()
-            localizer = make_localizer(locale, tdirs)
-            i18n_registry.register(tuple(), ILocalizer, locale, localizer)
-            environ[LOCALIZER_KEY] = localizer
+        localizer = get_localizer(locale, registry)
+        environ[LOCALIZER_KEY] = localizer
 
     return localizer

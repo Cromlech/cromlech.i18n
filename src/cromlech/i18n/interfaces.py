@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from zope.schema import TextLine
 from zope.interface import Interface
 
 

@@ -3,9 +3,7 @@
 import re
 import sys
 import threading
-
 from . import LOCALE_KEY
-from cromlech.browser import IRequest
 
 
 class LocaleSettings(threading.local):
