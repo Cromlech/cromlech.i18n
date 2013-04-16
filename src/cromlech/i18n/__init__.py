@@ -7,4 +7,4 @@ from crom.registry import Registry
 i18n_registry = Registry()
 
 from .interfaces import ILocale
-from .utils import Language
+from .utils import Language, getLanguage
