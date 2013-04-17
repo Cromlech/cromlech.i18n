@@ -14,6 +14,7 @@ install_requires = [
     ]
 
 tests_require = [
+    'polib',
     ]
 
 setup(name='cromlech.i18n',
@@ -36,6 +37,9 @@ setup(name='cromlech.i18n',
       zip_safe=False,
       tests_require=tests_require,
       install_requires=install_requires,
+      extras_require={
+        'test': tests_require
+        },
       entry_points="""
       # -*- Entry points: -*-
       [cromlech.i18n.translation_directory]

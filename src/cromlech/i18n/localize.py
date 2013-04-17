@@ -8,8 +8,12 @@ from zope.interface import implementer
 
 from .utils import getLocale, resolve_locale, normalize_lang
 from .translations import Translations
-from . import LOCALIZER_KEY, i18n_registry
+from . import COMPILE_MO_FILES_KEY, LOCALIZER_KEY, i18n_registry
+from .compile import compile_mo_file
 from .interfaces import ILocalizer, ITranslationDirectory
+
+
+COMPILE_MO_FILES = os.environ.get(COMPILE_MO_FILES_KEY, False)
 
 
 @implementer(ILocalizer)
@@ -61,19 +65,35 @@ def make_localizer(locale, translation_directories):
                 locale_dirs.append(ldir)
 
         for locale_dir in locale_dirs:
+            seen = set()
             messages_dir = os.path.join(locale_dir, 'LC_MESSAGES')
             if not os.path.isdir(os.path.realpath(messages_dir)):
                 continue
-            for mofile in os.listdir(messages_dir):
-                mopath = os.path.realpath(os.path.join(messages_dir,
-                                                       mofile))
-                if mofile.endswith('.mo') and os.path.isfile(mopath):
-                    with open(mopath, 'rb') as mofp:
-                        domain = mofile[:-3]
-                        dtrans = Translations(mofp, domain)
-                        translations.add(dtrans)
+            for filename in os.listdir(messages_dir):
+                mofile = None
+                basename, ext = os.path.splitext(filename)
+                filepath = os.path.realpath(
+                    os.path.join(messages_dir, filename))
+
+                if basename not in seen and os.path.isfile(filepath):
+                    if COMPILE_MO_FILES and ext == '.po':
+                        mofile = compile_mo_file(filepath)
+                    elif ext == '.mo':
+                        mofile = filepath
+
+                    if mofile is not None:
+                        seen.add(basename)
+                        with open(mofile, 'rb') as mofp:
+                             domain = filename[:-3]
+                             dtrans = Translations(mofp)
+                             translations.add(dtrans)
 
     return Localizer(locale_name=locale, translations=translations)
+
+
+def create_localizer(locale, registry=i18n_registry):
+    tdirs = ITranslationDirectory.subscription(lookup=registry)
+    return make_localizer(locale, tdirs)
 
 
 def get_localizer(locale, registry=i18n_registry):
@@ -81,8 +101,7 @@ def get_localizer(locale, registry=i18n_registry):
         name=locale, default=None, lookup=registry)
 
     if localizer is None:
-        tdirs = ITranslationDirectory.subscription(lookup=registry)
-        localizer = make_localizer(locale, tdirs)
+        localizer = create_localizer(locale, registry)
         i18n_registry.register(tuple(), ILocalizer, locale, localizer)
 
     return localizer

@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
 import translationstring
+import cromlech.i18n.localize
 from cromlech.i18n import i18n_registry
 from cromlech.i18n import load_translations_directories
 from cromlech.i18n import ITranslationDirectory, ILocalizer
-from cromlech.i18n.localize import get_localizer
+from cromlech.i18n.localize import create_localizer, COMPILE_MO_FILES
+from cromlech.i18n.translations import clean_test_translations_directory
 
 
 def setup_module(module):
@@ -12,7 +14,7 @@ def setup_module(module):
 
 
 def teardown_module(module):
-    pass
+    clean_test_translations_directory()
 
 
 def test_all():
@@ -20,9 +22,6 @@ def test_all():
 
 
 def test_localizer():
-    frfr_localizer = get_localizer('fr_FR')
-    frca_localizer = get_localizer('fr_CA')
-    assert frfr_localizer, frca_localizer
 
     brake = translationstring.TranslationString(
         'handbrake', domain='cromlech.i18n')
@@ -34,6 +33,15 @@ def test_localizer():
     sir = translationstring.TranslationString(
         'sir', domain='cromlech.i18n')
 
+    # No auto compiling
+    frfr_localizer = create_localizer('fr_FR')
+    assert frfr_localizer.translate(brake) == u'handbrake'
+
+    # Auto compiling
+    cromlech.i18n.localize.COMPILE_MO_FILES = True
+    frfr_localizer = create_localizer('fr_FR')
+    frca_localizer = create_localizer('fr_CA')
+
     assert frfr_localizer.translate(brake) == u'frein à main'
     assert frca_localizer.translate(brake) == u'brake à bras'
 
@@ -42,5 +50,3 @@ def test_localizer():
 
     assert frfr_localizer.translate(sir) == u'monsieur'
     assert frca_localizer.translate(sir) == u'monsieur'
-
-    

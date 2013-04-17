@@ -8,6 +8,7 @@ from . import i18n_registry
 from pkg_resources import iter_entry_points
 
 PY3 = sys.version_info[0] == 3
+TEST_TRANSLATIONS_PATH = os.path.join(os.path.dirname(__file__), "locales")
 
 
 class Translations(gettext.GNUTranslations, object):
@@ -160,8 +161,18 @@ def register_translations_directory(path, registry=i18n_registry):
 
 
 def register_test_translations(registry=i18n_registry):
-    path = os.path.join(os.path.dirname(__file__), "locales")
-    register_translations_directory(path, registry)
+    register_translations_directory(TEST_TRANSLATIONS_PATH, registry)
+
+
+def clean_test_translations_directory():
+    """removes all the .mo - for test purposes
+    """
+    for root, dirs, files in os.walk(TEST_TRANSLATIONS_PATH):
+        for filename in files:
+            if filename.endswith('.mo'):
+                path = os.path.join(root, filename)
+                print path
+                os.remove(path)
 
 
 _loaded = False
