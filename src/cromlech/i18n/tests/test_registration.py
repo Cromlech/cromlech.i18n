@@ -50,3 +50,11 @@ def test_localizer():
 
     assert frfr_localizer.translate(sir) == u'monsieur'
     assert frca_localizer.translate(sir) == u'monsieur'
+
+    # translation string do have a simple API
+    # we can have a zope.i18nmessage
+    from zope.i18nmessageid import MessageFactory
+    _ = MessageFactory('cromlech.i18n')
+    brake = _(u'handbrake')
+    assert frfr_localizer.translate(brake) == u'frein à main'
+    assert frca_localizer.translate(brake) == u'brake à bras'

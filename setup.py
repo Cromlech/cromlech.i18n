@@ -15,6 +15,7 @@ install_requires = [
 
 tests_require = [
     'polib',
+    'zope.i18nmessageid',
     ]
 
 setup(name='cromlech.i18n',
