@@ -6,7 +6,7 @@ import gettext
 from translationstring import Translator, Pluralizer
 from zope.interface import implementer
 
-from .utils import getLocale, resolve_locale, normalize_lang
+from .utils import getLocale, resolve_locale
 from .translations import Translations
 from . import COMPILE_MO_FILES_KEY, LOCALIZER_KEY, i18n_registry
 from .compile import compile_mo_file

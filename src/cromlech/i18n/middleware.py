@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from .utils import Language, accept_languages
+from .utils import Locale, accept_languages
 
 
 default = 'en'
@@ -20,7 +20,7 @@ def locale_settings(app, global_conf, allowed=default, default=default):
 
         preferred = accept_languages(environ['HTTP_ACCEPT_LANGUAGE'])
         language = best_language(preferred) or default
-        with Language(language):
+        with Locale(language):
             return app(environ, start_response)
 
     return locale_filter
