@@ -7,8 +7,8 @@ COMPILE_MO_FILES_KEY = 'cromlech_compile_mo_files'
 from crom import Registry
 i18n_registry = Registry()
 
-from .interfaces import ILanguage, ILocalizer, ITranslationDirectory
-from .utils import Language, getLanguage
+from .interfaces import ILocale, ILanguage, ILocalizer, ITranslationDirectory
+from .utils import Locale, setLocale, getLocale
 from .translations import (load_translations_directories,
                            reload_translations_directories,
                            register_translations_directory)

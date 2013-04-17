@@ -3,6 +3,14 @@
 from zope.interface import Interface
 
 
+class ILocale(Interface):
+    """Interface representive a language name.
+    """
+    def __str__():
+        """Returns the language as a string.
+        """
+
+
 class ILanguage(Interface):
     """Interface representive a language name.
     """

@@ -9,17 +9,14 @@ from . import LOCALE_KEY
 class LocaleSettings(threading.local):
     """Language resolution.
     """
-    language = None
+    locale = None
 
 
 locale_settings = LocaleSettings()
 
 
-def normalize_lang(lang):
-    lang = lang.strip()
-    lang = lang.replace('_', '-')
-    lang = lang.replace(' ', '')
-    return lang
+def persist_locale(environ, locale):
+    environ[LOCALE_KEY] = locale
 
 
 def resolve_locale(environ, default=None):
@@ -28,31 +25,23 @@ def resolve_locale(environ, default=None):
 
 def setLocale(locale=None):
     locale_settings.locale = locale
-    locale_settings.language = normalize_lang(locale)
 
 
 def getLocale():
     return locale_settings.locale
 
 
-def setLanguage(lang=None):
-    locale_settings.language = lang
+class Locale(object):
 
-
-def getLanguage():
-    return locale_settings.language
-
-
-class Language(object):
-
-    def __init__(self, language):
-        setLanguage(language)
+    def __init__(self, locale):
+        locale = locale
 
     def __enter__(self):
-        return getLanguage()
+        setLocale(self.locale)
+        return self.locale
 
     def __exit__(self, type, value, traceback):
-        return setLanguage()
+        return setLocale()
 
 
 def accept_languages(browser_pref_langs):
@@ -61,9 +50,9 @@ def accept_languages(browser_pref_langs):
     i = 0
     langs = []
     length = len(browser_pref_langs)
- 
+
     for lang in browser_pref_langs:
-        lang = lang.strip().lower().replace('_', '-')
+        lang = lang.strip()
         if lang:
             l = lang.split(';', 2)
             quality = []
