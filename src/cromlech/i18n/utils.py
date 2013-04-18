@@ -38,7 +38,7 @@ def getLocalizer():
     return locale_settings.localizer
 
 
-def setLocale(locale=None, registry):
+def setLocale(locale=None):
     locale_settings.locale = locale
  
 
