@@ -9,7 +9,8 @@ i18n_registry = Registry()
 
 from .interfaces import ILocale, ILanguage, ILocalizer, ITranslationDirectory
 from .utils import Locale, setLocale, getLocale, getLocalizer, setLocalizer
-from .utils import accept_languages
+from .utils import accept_languages, get_environ_language, normalize_language
+from .localize import get_localizer, make_localizer, Localizer
 from .translations import (load_translations_directories,
                            reload_translations_directories,
                            register_translations_directory)

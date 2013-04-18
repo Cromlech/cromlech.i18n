@@ -2,11 +2,12 @@
 
 import os
 import gettext
+import logging
 
 from translationstring import Translator, Pluralizer
 from zope.interface import implementer
 
-from .utils import getLocale, resolve_locale
+from .utils import getLocale, resolve_locale, normalize_language
 from .translations import Translations
 from . import COMPILE_MO_FILES_KEY, LOCALIZER_KEY, i18n_registry
 from .compile import compile_mo_file
@@ -82,11 +83,23 @@ def make_localizer(locale, translation_directories):
                         mofile = filepath
 
                     if mofile is not None:
-                        seen.add(basename)
+
                         with open(mofile, 'rb') as mofp:
-                             domain = filename[:-3]
-                             dtrans = Translations(mofp)
-                             translations.add(dtrans)
+                            domain = filename[:-3]
+                            dtrans = Translations(mofp)
+                            language = dtrans.info()['language-code']
+                            nlocale, _ = normalize_language(language)
+                            if not locale in (language, nlocale):
+                                logging.critical(
+                                    'The file %r contains the language '
+                                    'code %r but the locale expected is '
+                                    '%r because the folder is named after '
+                                    'the locale. Please fix the inconsistency.'
+                                    ' Folder ignored.' % (
+                                        mofile, language, locale))
+                            else:
+                                translations.add(dtrans)
+                        seen.add(basename)
 
     return Localizer(locale_name=locale, translations=translations)
 

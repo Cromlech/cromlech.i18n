@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import re
 import sys
 import threading
+from locale import normalize
 from . import LOCALE_KEY, i18n_registry
 from .interfaces import ILocalizer
 
@@ -40,7 +40,7 @@ def getLocalizer():
 
 def setLocale(locale=None):
     locale_settings.locale = locale
- 
+
 
 def getLocale():
     return locale_settings.locale
@@ -48,14 +48,14 @@ def getLocale():
 
 class Locale(object):
 
-    def __init__(self, locale):
-        locale = locale
+    def __init__(self, locale, localizer=None):
+        self.locale = locale
+        self.localizer = localizer
 
     def __enter__(self):
         setLocale(self.locale)
-        localizer = query_localizer(locale)
-        setLocalizer(localizer)
-        return self.locale
+        if self.localizer is not None:
+            setLocalizer(self.localizer)
 
     def __exit__(self, type, value, traceback):
         setLocale()
@@ -98,3 +98,39 @@ def accept_languages(browser_pref_langs):
     # Filter quality string
     langs = map(lambda x: x[1], langs)
     return langs
+
+
+def normalize_language(langcode):
+    langcode = langcode.replace('-', '_')
+    localename = normalize(langcode)
+    if not '.' in localename:
+        # This is not a valid or recognized language name
+        return None, None
+    return localename.split(".")
+
+
+def normalized_lang(func):
+    def normalize_locale(*args):
+        lang = func(*args)
+        if lang is not None:
+            locale, encoding = normalize_language(lang)
+            return locale
+        return lang
+    return normalize_locale
+
+
+@normalized_lang
+def get_environ_language(environ, *restricted):
+
+        def best_language(preferred):
+            for lang in preferred:
+                if lang in restricted:
+                    return lang
+            return None
+
+        languages = accept_languages(environ['HTTP_ACCEPT_LANGUAGE'])
+        if languages:
+            if restricted:
+                return best_language(languages)
+            return languages[0]
+        return None
