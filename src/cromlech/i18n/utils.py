@@ -3,13 +3,15 @@
 import re
 import sys
 import threading
-from . import LOCALE_KEY
+from . import LOCALE_KEY, i18n_registry
+from .interfaces import ILocalizer
 
 
 class LocaleSettings(threading.local):
     """Language resolution.
     """
     locale = None
+    localizer = None
 
 
 locale_settings = LocaleSettings()
@@ -23,9 +25,22 @@ def resolve_locale(environ, default=None):
     return environ.get(LOCALE_KEY, default)
 
 
-def setLocale(locale=None):
-    locale_settings.locale = locale
+def query_localizer(locale, registry=i18n_registry, default=None):
+    return ILocalizer.component(
+        name=locale, lookup=i18n_registry, default=default)
 
+
+def setLocalizer(localizer=None):
+    locale_settings.localizer = localizer
+
+
+def getLocalizer():
+    return locale_settings.localizer
+
+
+def setLocale(locale=None, registry):
+    locale_settings.locale = locale
+ 
 
 def getLocale():
     return locale_settings.locale
@@ -38,10 +53,13 @@ class Locale(object):
 
     def __enter__(self):
         setLocale(self.locale)
+        localizer = query_localizer(locale)
+        setLocalizer(localizer)
         return self.locale
 
     def __exit__(self, type, value, traceback):
-        return setLocale()
+        setLocale()
+        setLocalizer()
 
 
 def accept_languages(browser_pref_langs):
