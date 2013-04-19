@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import sys
 import threading
 from locale import normalize
 from . import LOCALE_KEY, i18n_registry
@@ -83,12 +82,12 @@ def accept_languages(browser_pref_langs):
                 except:
                     pass
             if quality == []:
-                quality = float(length-i)
+                quality = float(length - i)
             language = l[0]
             langs.append((quality, language))
             if '-' in language:
                 baselanguage = language.split('-')[0]
-                langs.append((quality-0.001, baselanguage))
+                langs.append((quality - 0.001, baselanguage))
             i = i + 1
 
     # Sort and reverse it
@@ -120,7 +119,7 @@ def normalized_lang(func):
 
 
 @normalized_lang
-def get_environ_language(environ, *restricted):
+def get_environ_language(environ, restricted=None):
 
         def best_language(preferred):
             for lang in preferred:

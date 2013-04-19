@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import os
-import gettext
 import logging
 
 from translationstring import Translator, Pluralizer
@@ -85,7 +84,6 @@ def make_localizer(locale, translation_directories):
                     if mofile is not None:
 
                         with open(mofile, 'rb') as mofp:
-                            domain = filename[:-3]
                             dtrans = Translations(mofp)
                             language = dtrans.info()['language-code']
                             nlocale, _ = normalize_language(language)
