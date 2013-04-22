@@ -133,3 +133,10 @@ def get_environ_language(environ, restricted=None):
                 return best_language(languages)
             return languages[0]
         return None
+
+
+def translate(message):
+    localizer = getLocalizer()
+    if localizer is None:
+        return message
+    return localizer.translate(message)
