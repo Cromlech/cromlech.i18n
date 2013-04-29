@@ -42,5 +42,5 @@ def compile_mo_file(pofile):
             po = polib.pofile(pofile)
             po.save_as_mofile(mofile)
             return mofile
-        except (IOError, OSError):
-            logging.warn('Error while compiling %s' % pofile)
+        except (IOError, OSError), e:
+            logging.warn('Error while compiling %s (%s).' % (pofile, e))

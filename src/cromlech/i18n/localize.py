@@ -25,7 +25,7 @@ class Localizer(object):
         self.pluralizer = None
         self.translator = None
 
-    def translate(self, tstring, domain=None, mapping=None):
+    def translate(self, tstring, domain=None, mapping=None, **kws):
         if self.translator is None:
             self.translator = Translator(self.translations)
         return self.translator(
@@ -36,6 +36,29 @@ class Localizer(object):
             self.pluralizer = Pluralizer(self.translations)
         return self.pluralizer(
             singular, plural, n, domain=domain, mapping=mapping)
+
+
+def create_translation_catalog(mofile, locale):
+    with open(mofile, 'rb') as mofp:
+        dtrans = Translations(mofp)
+        language = dtrans.info().get('language-code')
+        if language is None:
+            logging.critical(
+                'The file %r contains no language '
+                'code information.' % mofile)
+            return None
+        else:
+            nlocale, _ = normalize_language(language)
+            if not locale in (language, nlocale):
+                logging.critical(
+                    'The file %r contains the language '
+                    'code %r but the locale expected is '
+                    '%r because the folder is named after '
+                    'the locale. Please fix the inconsistency.'
+                    ' Folder ignored.' % (
+                        mofile, language, locale))
+                return None
+            return dtrans
 
 
 def make_localizer(locale, translation_directories):
@@ -82,22 +105,10 @@ def make_localizer(locale, translation_directories):
                         mofile = filepath
 
                     if mofile is not None:
-
-                        with open(mofile, 'rb') as mofp:
-                            dtrans = Translations(mofp)
-                            language = dtrans.info()['language-code']
-                            nlocale, _ = normalize_language(language)
-                            if not locale in (language, nlocale):
-                                logging.critical(
-                                    'The file %r contains the language '
-                                    'code %r but the locale expected is '
-                                    '%r because the folder is named after '
-                                    'the locale. Please fix the inconsistency.'
-                                    ' Folder ignored.' % (
-                                        mofile, language, locale))
-                            else:
-                                translations.add(dtrans)
                         seen.add(basename)
+                        dtrans = create_translation_catalog(mofile, locale)
+                        if dtrans is not None:
+                            translations.add(dtrans)
 
     return Localizer(locale_name=locale, translations=translations)
 

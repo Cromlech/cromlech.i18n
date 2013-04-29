@@ -135,8 +135,8 @@ def get_environ_language(environ, restricted=None):
         return None
 
 
-def translate(message):
+def translate(message, *args):
     localizer = getLocalizer()
     if localizer is None:
         return message
-    return localizer.translate(message)
+    return localizer.translate(message, *args)
