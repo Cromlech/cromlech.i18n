@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from .utils import Locale, get_environ_language
+from . import Locale
+from .utils import get_environ_language
 
 
 default = 'en'

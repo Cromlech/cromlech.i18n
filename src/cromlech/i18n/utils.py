@@ -45,22 +45,6 @@ def getLocale():
     return locale_settings.locale
 
 
-class Locale(object):
-
-    def __init__(self, locale, localizer=None):
-        self.locale = locale
-        self.localizer = localizer
-
-    def __enter__(self):
-        setLocale(self.locale)
-        if self.localizer is not None:
-            setLocalizer(self.localizer)
-
-    def __exit__(self, type, value, traceback):
-        setLocale()
-        setLocalizer()
-
-
 def accept_languages(browser_pref_langs):
 
     browser_pref_langs = browser_pref_langs.split(',')
