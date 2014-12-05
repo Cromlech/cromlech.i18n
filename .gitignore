@@ -22,6 +22,8 @@
 build/
 dist/
 
+# translations
+*.mo
 
 # miscellaneous
 *.orig
