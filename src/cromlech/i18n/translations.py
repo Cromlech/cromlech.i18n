@@ -171,7 +171,6 @@ def clean_test_translations_directory():
         for filename in files:
             if filename.endswith('.mo'):
                 path = os.path.join(root, filename)
-                print path
                 os.remove(path)
 
 

@@ -113,6 +113,7 @@ def get_environ_language(environ, restricted=None):
 
         languages = accept_languages(environ['HTTP_ACCEPT_LANGUAGE'])
         if languages:
+            languages = list(languages)
             if restricted:
                 return best_language(languages)
             return languages[0]
