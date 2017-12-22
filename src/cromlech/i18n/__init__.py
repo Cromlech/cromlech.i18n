@@ -35,5 +35,5 @@ class Locale(object):
 class EnvironLocale(Locale):
 
     def __init__(self, environ, default='en_US'):
-        self.locale = get_environ_language(environ)
+        self.locale = get_environ_language(environ) or default
         self.localizer = get_localizer(self.locale)

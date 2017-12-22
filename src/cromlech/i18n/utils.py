@@ -111,12 +111,14 @@ def get_environ_language(environ, restricted=None):
                     return lang
             return None
 
-        languages = accept_languages(environ['HTTP_ACCEPT_LANGUAGE'])
-        if languages:
-            languages = list(languages)
-            if restricted:
-                return best_language(languages)
-            return languages[0]
+        http_accepted = environ.get('HTTP_ACCEPT_LANGUAGE')
+        if http_accepted:
+            languages = accept_languages(http_accepted)
+            if languages:
+                languages = list(languages)
+                if restricted:
+                    return best_language(languages)
+                return languages[0]
         return None
 
 
