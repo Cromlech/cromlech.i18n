@@ -177,7 +177,7 @@ def clean_test_translations_directory():
 _loaded = False
 
 
-def load_translations_directories(registry=i18n_registry):
+def load_translations_directories(registry=i18n_registry, allow_tests=False):
     """Goes through all available components loaders and call them.
     """
     global _loaded
@@ -185,6 +185,11 @@ def load_translations_directories(registry=i18n_registry):
         return
     for loader_entry in iter_entry_points(
             'cromlech.i18n.translation_directory'):
+
+        if loader_entry.name.startswith('test_') and not allow_tests:
+            # We do not load test entries
+            continue
+
         loader = loader_entry.load()
         if not callable(loader):
             raise TypeError(
@@ -194,11 +199,11 @@ def load_translations_directories(registry=i18n_registry):
     _loaded = True
 
 
-def reload_translations_directories(registry=i18n_registry):
+def reload_translations_directories(registry=i18n_registry, allow_tests=False):
     """Reload all components.
 
     Mainly used by testing layers.
     """
     global _loaded
     _loaded = False
-    load_translations_directories(registry)
+    load_translations_directories(registry, allow_tests)

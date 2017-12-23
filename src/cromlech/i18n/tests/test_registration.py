@@ -10,7 +10,7 @@ from cromlech.i18n.translations import clean_test_translations_directory
 
 
 def setup_module(module):
-    load_translations_directories(i18n_registry)
+    load_translations_directories(i18n_registry, allow_tests=True)
 
 
 def teardown_module(module):
