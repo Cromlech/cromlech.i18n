@@ -5,7 +5,7 @@ import cromlech.i18n.localize
 from cromlech.i18n import i18n_registry
 from cromlech.i18n import load_translations_directories
 from cromlech.i18n import ITranslationDirectory, ILocalizer
-from cromlech.i18n.localize import create_localizer, COMPILE_MO_FILES
+from cromlech.i18n.localize import create_localizer
 from cromlech.i18n.translations import clean_test_translations_directory
 
 
@@ -15,10 +15,6 @@ def setup_module(module):
 
 def teardown_module(module):
     clean_test_translations_directory()
-
-
-def test_all():
-    assert list(ITranslationDirectory.subscription(lookup=i18n_registry))
 
 
 def test_localizer():
@@ -41,20 +37,23 @@ def test_localizer():
     cromlech.i18n.localize.COMPILE_MO_FILES = True
     frfr_localizer = create_localizer('fr_FR')
     frca_localizer = create_localizer('fr_CA')
-
+    
     assert frfr_localizer.translate(brake) == u'frein à main'
     assert frca_localizer.translate(brake) == u'brake à bras'
 
     assert frfr_localizer.translate(tap) == u'robinet'
     assert frca_localizer.translate(tap) == u'champlure'
 
-    assert frfr_localizer.translate(sir) == u'monsieur'
+    # Fallbacks: fr_CA will fallback on 'fr' if not found in fr_CA
+    # The fr_CA is cut into a list like : fr, fr_CA,
+    # ordered from least specific to more specific
     assert frca_localizer.translate(sir) == u'monsieur'
 
     # translation string do have a simple API
     # we can have a zope.i18nmessage
     from zope.i18nmessageid import MessageFactory
     _ = MessageFactory('cromlech.i18n')
+
     brake = _(u'handbrake')
     assert frfr_localizer.translate(brake) == u'frein à main'
     assert frca_localizer.translate(brake) == u'brake à bras'

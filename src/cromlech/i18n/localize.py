@@ -28,6 +28,7 @@ class Localizer(object):
     def translate(self, tstring, domain=None, mapping=None, **kws):
         if self.translator is None:
             self.translator = Translator(self.translations)
+            
         return self.translator(
             tstring, domain=domain, mapping=mapping)
 
@@ -38,7 +39,7 @@ class Localizer(object):
             singular, plural, n, domain=domain, mapping=mapping)
 
 
-def create_translation_catalog(mofile, locale):
+def create_translation_catalog(mofile, locale, accepted):
     with open(mofile, 'rb') as mofp:
         dtrans = Translations(mofp)
         language = dtrans.info().get('language-code')
@@ -48,15 +49,14 @@ def create_translation_catalog(mofile, locale):
                 'code information.' % mofile)
             return None
         else:
-            nlocale, _ = normalize_language(language)
-            if not locale in (language, nlocale):
+            if not locale in accepted:
                 logging.critical(
                     'The file %r contains the language '
-                    'code %r but the locale expected is '
+                    'code %r but the locale expected must by any of'
                     '%r because the folder is named after '
                     'the locale. Please fix the inconsistency.'
                     ' Folder ignored.' % (
-                        mofile, language, locale))
+                        mofile, language, accepted))
                 return None
             return dtrans
 
@@ -90,6 +90,7 @@ def make_localizer(locale, translation_directories):
         for locale_dir in locale_dirs:
             seen = set()
             messages_dir = os.path.join(locale_dir, 'LC_MESSAGES')
+            
             if not os.path.isdir(os.path.realpath(messages_dir)):
                 continue
             for filename in os.listdir(messages_dir):
@@ -106,7 +107,8 @@ def make_localizer(locale, translation_directories):
 
                     if mofile is not None:
                         seen.add(basename)
-                        dtrans = create_translation_catalog(mofile, locale)
+                        dtrans = create_translation_catalog(
+                            mofile, locale, locales_to_try)
                         if dtrans is not None:
                             translations.add(dtrans)
 
